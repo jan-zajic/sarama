@@ -17,6 +17,8 @@ var validID = regexp.MustCompile(`\A[A-Za-z0-9._-]+\z`)
 
 // Config is used to pass multiple configuration options to Sarama's constructors.
 type Config struct {
+	BrokerALiases map[string]string
+	
 	// Net is the namespace for network-level properties used by the Broker, and
 	// shared by the Client/Producer/Consumer.
 	Net struct {
@@ -278,6 +280,7 @@ type Config struct {
 // NewConfig returns a new configuration instance with sane defaults.
 func NewConfig() *Config {
 	c := &Config{}
+	c.BrokerALiases = make(map[string]string)
 
 	c.Net.MaxOpenRequests = 5
 	c.Net.DialTimeout = 30 * time.Second

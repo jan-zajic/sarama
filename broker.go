@@ -79,6 +79,11 @@ func (b *Broker) Open(conf *Config) error {
 	}
 
 	b.lock.Lock()
+	
+	addr, hasAlias := conf.BrokerALiases[b.addr]
+	if !hasAlias {
+		addr = b.addr
+	}
 
 	go withRecover(func() {
 		defer b.lock.Unlock()
@@ -89,9 +94,9 @@ func (b *Broker) Open(conf *Config) error {
 		}
 
 		if conf.Net.TLS.Enable {
-			b.conn, b.connErr = tls.DialWithDialer(&dialer, "tcp", b.addr, conf.Net.TLS.Config)
+			b.conn, b.connErr = tls.DialWithDialer(&dialer, "tcp", addr, conf.Net.TLS.Config)
 		} else {
-			b.conn, b.connErr = dialer.Dial("tcp", b.addr)
+			b.conn, b.connErr = dialer.Dial("tcp", addr)
 		}
 		if b.connErr != nil {
 			Logger.Printf("Failed to connect to broker %s: %s\n", b.addr, b.connErr)
